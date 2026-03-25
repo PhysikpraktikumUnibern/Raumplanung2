@@ -1,9 +1,9 @@
 name: Update daily image
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "5 6 * * *"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,30 +21,27 @@ jobs:
       - name: Datum bestimmen
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Dateiinfos vorher anzeigen
+      - name: Quelldatei prüfen
         run: |
           echo "Heute: $DATE"
-          ls -l
-          ls -l images || true
-          file "images/$DATE.jpg" || true
-          wc -c "images/$DATE.jpg" || true
+          ls -l images
+          file "images/$DATE.jpg"
+          wc -c "images/$DATE.jpg"
 
       - name: Bild kopieren
-        run: |
-          cp "images/$DATE.jpg" current.jpg
+        run: cp "images/$DATE.jpg" current.jpg
 
-      - name: Dateiinfos nachher anzeigen
+      - name: Kopie prüfen
         run: |
           ls -l current.jpg
-          file current.jpg || true
-          wc -c current.jpg || true
-          sha256sum "images/$DATE.jpg" current.jpg || true
+          file current.jpg
+          wc -c current.jpg
+          sha256sum "images/$DATE.jpg" current.jpg
 
       - name: Committen
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git status
           git add current.jpg
           git commit -m "Update image for $DATE" || echo "Keine Änderungen"
 
