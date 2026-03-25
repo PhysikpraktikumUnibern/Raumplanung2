@@ -50,4 +50,3 @@ jobs:
 
       - name: Pushen
         run: git push origin main
-        run: git push origin main
