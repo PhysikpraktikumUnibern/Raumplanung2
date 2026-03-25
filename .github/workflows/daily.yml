@@ -38,6 +38,11 @@ jobs:
           wc -c current.jpg
           sha256sum "images/$DATE.jpg" current.jpg
 
+      - name: Git Status prüfen
+        run: |
+          git status
+          ls -l current.jpg
+
       - name: Committen
         run: |
           git config user.name "github-actions[bot]"
@@ -47,3 +52,6 @@ jobs:
 
       - name: Pushen
         run: git push origin main
+
+      - name: Letzte Commits anzeigen
+        run: git log --oneline -n 3
