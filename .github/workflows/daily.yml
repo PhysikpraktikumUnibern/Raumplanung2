@@ -21,21 +21,33 @@ jobs:
       - name: Datum bestimmen
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Bild setzen
+      - name: Dateiinfos vorher anzeigen
         run: |
-          if [ -f "images/$DATE.jpg" ]; then
-            cp "images/$DATE.jpg" current.jpg
-          else
-            echo "Kein Bild für heute gefunden: images/$DATE.jpg"
-            exit 1
-          fi
+          echo "Heute: $DATE"
+          ls -l
+          ls -l images || true
+          file "images/$DATE.jpg" || true
+          wc -c "images/$DATE.jpg" || true
+
+      - name: Bild kopieren
+        run: |
+          cp "images/$DATE.jpg" current.jpg
+
+      - name: Dateiinfos nachher anzeigen
+        run: |
+          ls -l current.jpg
+          file current.jpg || true
+          wc -c current.jpg || true
+          sha256sum "images/$DATE.jpg" current.jpg || true
 
       - name: Committen
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git status
           git add current.jpg
           git commit -m "Update image for $DATE" || echo "Keine Änderungen"
 
       - name: Pushen
+        run: git push origin main
         run: git push origin main
